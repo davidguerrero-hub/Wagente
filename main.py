@@ -1,7 +1,7 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 import os
-
+#asd
 load_dotenv()
 # Langchain se encargara de buscar GOOGLE_API_KEY en .env
 
