@@ -1,13 +1,23 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
-#asd
-load_dotenv()
-# Langchain se encargara de buscar GOOGLE_API_KEY en .env
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-respuesta = llm.invoke("Q es RAG?")
-print(respuesta.content)
+load_dotenv()
+KEY = os.getenv("GOOGLE_API_KEY")
+URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+MODELS = [
+    {"nombre": "gemini-3.1-flash-lite", "activo": True},
+    {"nombre": "gemini-2.5-flash", "activo": True},
+    {"nombre": "gemini-3.5-flash", "activo": True},
+    {"nombre": "gemini-3-flash-preview", "activo": True},
+    {"nombre": "gemini-2.5-flash-lite", "activo": True},
+    {"nombre": "gemini-2.0-flash", "activo": True}
+]
+
+llm = OpenAI(base_url=URL, api_key=KEY)
+response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
+                                                                            "content": "Hola"}])
+print(response.choices[0].message.content)
 
 # Extraer Documentos
 # Curar datos
