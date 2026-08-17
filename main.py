@@ -18,16 +18,18 @@ MODELS = [
 parser = Parser("data/W3_ROC_Data.pdf")
 string = parser.curate()
 chunks = parser.split(string)
-print(len(chunks))
-print(chunks[0])
-print("-" * 60)
-print(chunks[1])
-print("-" * 60)
-print(chunks[2])
+# print("Numero de Chunks: " + str(len(chunks)) + "\n")
+# for i in range(10):
+#     print(chunks[i])
+#     print("-" * 60)
+
 # llm = OpenAI(base_url=URL, api_key=KEY)
 # response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
 #                                                                             "content": "Hola"}])
 # print(response.choices[0].message.content)
+
+
+
 
 # Extraer Documentos
 # Curar datos
