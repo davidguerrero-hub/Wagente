@@ -1,9 +1,16 @@
 import pymupdf
-# from hugging_face import hugging_hub
+import huggingface_hub
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 class Parser():
-    def __init__(self, document_path: str = "data/W3_ROC_Data.pdf"):
+    def __init__(self, document_path: str = "data/W3_ROC_Data.pdf", arg_size: int = 800, arg_overlap: int = 200):
         self.document = pymupdf.open(document_path)
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size = arg_size, 
+            chunk_overlap = arg_overlap, 
+            separators = ["\n\n", ".", ",", "\n", " ", ""], 
+            keep_separator="end")
+        
 
     def curate(self):
         content: str = ""
@@ -19,3 +26,6 @@ class Parser():
             content += columns[0] + columns[1]
         return content
 
+    def split(self, text: str):
+        chunks = self.splitter.split_text(text)
+        return chunks

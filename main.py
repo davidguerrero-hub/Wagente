@@ -17,7 +17,13 @@ MODELS = [
 
 parser = Parser("data/W3_ROC_Data.pdf")
 string = parser.curate()
-print(string)
+chunks = parser.split(string)
+print(len(chunks))
+print(chunks[0])
+print("-" * 60)
+print(chunks[1])
+print("-" * 60)
+print(chunks[2])
 # llm = OpenAI(base_url=URL, api_key=KEY)
 # response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
 #                                                                             "content": "Hola"}])
