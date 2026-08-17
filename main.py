@@ -1,3 +1,4 @@
+from pdf_parser import Parser
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -14,10 +15,13 @@ MODELS = [
     {"nombre": "gemini-2.0-flash", "activo": True}
 ]
 
-llm = OpenAI(base_url=URL, api_key=KEY)
-response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
-                                                                            "content": "Hola"}])
-print(response.choices[0].message.content)
+parser = Parser("data/W3_ROC_Data.pdf")
+string = parser.curate()
+print(string)
+# llm = OpenAI(base_url=URL, api_key=KEY)
+# response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
+#                                                                             "content": "Hola"}])
+# print(response.choices[0].message.content)
 
 # Extraer Documentos
 # Curar datos
