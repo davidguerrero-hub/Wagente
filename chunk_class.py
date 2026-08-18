@@ -26,3 +26,5 @@ class Chunk():
     def set_page(self, page: int):
         self.__page = page
         return True
+
+    # Convertir a diccionario

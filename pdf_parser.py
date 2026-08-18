@@ -1,6 +1,7 @@
 import pymupdf
 import huggingface_hub
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+import re
 
 class Parser():
     def __init__(self, document_path: str = "data/W3_ROC_Data.pdf", arg_size: int = 1000, arg_overlap: int = 300):
@@ -23,7 +24,9 @@ class Parser():
                     columns[0] += texto + "\n"
                 else:
                     columns[1] += texto + "\n"
-            # print(columns[0] + "\n" + "-"*30) if columns[0] else print("nada")
+            columns[0] = self.__num_page(columns[0])
+            print(columns[0] + "-"*30) if columns[0] else print("nada")
+            # print(columns[1] + "-"*30) if columns[1] else print("nada")
             # print(repr(columns[0][-10:])) if columns[0] else print("nada")
             content += columns[0] + columns[1]
         return content
@@ -32,6 +35,14 @@ class Parser():
         chunks = self.splitter.split_text(text)
         return chunks
 
-    # Hacer funcion especializada para eleminar num de pagina
-    # Hacer funcion especializada para guion
-    # > Eso debe estar dentro del bucle de columnas
+    def __num_page(self, text: str):
+        text = re.sub(r'(\n)(\d+)(\n+)(\s*)$', '\n', text)      # (\d+) 1 o mas digitos, (\s*) 0 o mas espacios
+        return text
+
+    def __hyphen(self, text: str):
+        text = re.sub(r'(\w+)(-)(\n)(\w+)$', '\1\4', text)
+        return text
+    
+    # Implementar hyphen
+    # Probar hyphen
+    # Meterlo en jsonl

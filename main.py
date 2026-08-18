@@ -18,6 +18,7 @@ MODELS = [
 parser = Parser("data/W3_ROC_Data.pdf")
 string = parser.curate()
 chunks = parser.split(string)
+
 # print("Numero de Chunks: " + str(len(chunks)) + "\n")
 # for i in range(10):
 #     print(chunks[i])
