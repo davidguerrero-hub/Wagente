@@ -16,11 +16,7 @@ MODELS = [
 ]
 
 parser = Parser()
-lista = parser.get_files()
-print(lista)
-# string = parser.curate()
-# chunks = parser.split(string)
-
+parser.convert()
 
 
 # print("Numero de Chunks: " + str(len(chunks)) + "\n")

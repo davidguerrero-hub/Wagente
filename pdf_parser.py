@@ -5,6 +5,18 @@ import json
 import re
 
 class Parser():
+
+    def convert(self):
+        paths = self.get_files()
+        array_doc = []
+        for p in paths:
+            array_doc.append(self.separate(p))
+        for doc in array_doc:
+            self.curate(doc)
+        self.create_jsonl(array_doc)
+        return True
+
+
     def get_files(self, dir: str = "documents"):
         array = []
         path = Path(dir)
@@ -13,13 +25,9 @@ class Parser():
             array.append(str(f))
         return array
 
-    def convert(self):
-        documets = self.get_files()
-        for doc in documets:
-            self.separate(doc)
 
     def separate(self, path: str, page_init: int = 0):
-        page: int = page_init
+        number_page: int = page_init                # 0 ya que la portada no cuenta
         array = []
         document = pymupdf.open(path)
         for page in document:
@@ -33,36 +41,23 @@ class Parser():
                 else:
                     columns[1] += texto + "\n"
             for column in columns:
-                array.append({"texto": column})
-            content = columns[0] + columns[1]
-            array.append(content)
-        return array
+                array.append({"text": column, "metadata": {"page": number_page, "file": path}})
+                number_page += 1
+        return array                                # [{..., {..., ...}}, ...]
 
 
-    def curate(self):
-        array = []
-        content: str = ""
-        for page in self.document:
-            blocks = page.get_text("blocks")
-            columns = ["", ""]
-            for block in blocks:
-                x0, y0, x1, y1, texto, *_ = block       # Asignacion de indices de un array
-                if (x0 < 320):
-                    columns[0] += texto + "\n"
-                else:
-                    columns[1] += texto + "\n"
-            # print(columns[0] + "="*50) if columns[0] else print("nada")
-            # print(columns[1] + "="*50) if columns[1] else print("nada")
-            # print(repr(columns[0]) + "="*50) if columns[0] else print("nada")
-            columns[0] = self.__num_page(columns[0])
-            content = columns[0] + columns[1]
-            content = self.__hyphen(content)
-            array.append(content)
-        return array
+    def curate(self, array):
+        for page in array:
+            page["text"] = self.__num_page(page["text"])
+            page["text"] = self.__hyphen(page["text"])
 
-    # def split(self, text: str):     # embedding_model
-    #     chunks = self.splitter.split_text(text)
-    #     return chunks
+
+    def create_jsonl(self, array: list):
+        with open("documents/document.jsonl", "w", encoding="utf-8") as file:
+            for i in array:
+                for j in i:
+                    file.write(json.dumps(j, ensure_ascii=False) + "\n")
+
 
     def __num_page(self, text: str):
         text = re.sub(r'(\n)(\d+)(\n+)(\s*)$', '\n', text)      # (\d+) 1 o mas digitos, (\s*) 0 o mas espacios
@@ -70,21 +65,4 @@ class Parser():
 
     def __hyphen(self, text: str):
         text = re.sub(r'(\w+)(-)(\n)(\w*)', r'\1\4', text)     # (\w+) 1 o mas texto, (r'\1\4) primer y cuarto bloque '
-        # text = re.sub(r'-\n$', "", text)
         return text
-    
-    # Implementar hyphen
-    # Probar hyphen
-    # Meterlo en jsonl
-
-    def create_jsonl(self, array: list):
-        with open("data/jsonl.", "w", encoding="utf-8") as file:
-            for i in len(array):
-                dic = {
-                    "id": 1, 
-                    "source": "data/W3_ROC_Data.pdf",
-                    "page": i, 
-                    "content": array[i], 
-                    "extra": ""
-                }
-            file.write(json.dumps(dic, ensure_ascii=False) + "\n")
