@@ -1,17 +1,43 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pathlib import Path
 import pymupdf
 import json
 import re
 
-
 class Parser():
-    def __init__(self, document_path: str = "data/W3_ROC_Data.pdf", arg_size: int = 1000, arg_overlap: int = 300):
-        self.document = pymupdf.open(document_path)
-        self.splitter = RecursiveCharacterTextSplitter(     # Se encarga embedding_model
-            chunk_size = arg_size, 
-            chunk_overlap = arg_overlap, 
-            separators = ["\n\n", ". ", ",", "\n", " ", ""], 
-            keep_separator="end")
+    def get_files(self, dir: str = "documents"):
+        array = []
+        path = Path(dir)
+        files = path.glob("*.pdf")
+        for f in files:
+            array.append(str(f))
+        return array
+
+    def convert(self):
+        documets = self.get_files()
+        for doc in documets:
+            self.separate(doc)
+
+    def separate(self, path: str, page_init: int = 0):
+        page: int = page_init
+        array = []
+        document = pymupdf.open(path)
+        for page in document:
+            columns = ["", ""]
+            blocks = page.get_text("blocks")        # Separado por \n, block siendo un objeto
+            for block in blocks:
+                pos_x = block[0]                    # 1, 2, 3 serian y0, x1, y1
+                texto = block[4]
+                if (pos_x < 320):
+                    columns[0] += texto + "\n"
+                else:
+                    columns[1] += texto + "\n"
+            for column in columns:
+                array.append({"texto": column})
+            content = columns[0] + columns[1]
+            array.append(content)
+        return array
+
 
     def curate(self):
         array = []
@@ -34,9 +60,9 @@ class Parser():
             array.append(content)
         return array
 
-    def split(self, text: str):     # embedding_model
-        chunks = self.splitter.split_text(text)
-        return chunks
+    # def split(self, text: str):     # embedding_model
+    #     chunks = self.splitter.split_text(text)
+    #     return chunks
 
     def __num_page(self, text: str):
         text = re.sub(r'(\n)(\d+)(\n+)(\s*)$', '\n', text)      # (\d+) 1 o mas digitos, (\s*) 0 o mas espacios

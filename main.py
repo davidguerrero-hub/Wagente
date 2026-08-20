@@ -15,9 +15,13 @@ MODELS = [
     {"nombre": "gemini-2.0-flash", "activo": True}
 ]
 
-parser = Parser("data/W3_ROC_Data.pdf")
-string = parser.curate()
-chunks = parser.split(string)
+parser = Parser()
+lista = parser.get_files()
+print(lista)
+# string = parser.curate()
+# chunks = parser.split(string)
+
+
 
 # print("Numero de Chunks: " + str(len(chunks)) + "\n")
 # for i in range(10):
