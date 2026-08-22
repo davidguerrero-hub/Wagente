@@ -1,4 +1,3 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pathlib import Path
 import pymupdf
 import json
@@ -6,7 +5,7 @@ import re
 
 class Parser():
 
-    def convert(self):
+    def convert(self):                              # Metodo unificador
         paths = self.get_files()
         array_doc = []
         for p in paths:
@@ -48,8 +47,8 @@ class Parser():
 
     def curate(self, array):
         for page in array:
-            page["text"] = self.__num_page(page["text"])
-            page["text"] = self.__hyphen(page["text"])
+            page["text"] = self.num_page(page["text"])
+            page["text"] = self.hyphen(page["text"])
 
 
     def create_jsonl(self, array: list):
@@ -59,10 +58,10 @@ class Parser():
                     file.write(json.dumps(j, ensure_ascii=False) + "\n")
 
 
-    def __num_page(self, text: str):
+    def num_page(self, text: str):
         text = re.sub(r'(\n)(\d+)(\n+)(\s*)$', '\n', text)      # (\d+) 1 o mas digitos, (\s*) 0 o mas espacios
         return text
 
-    def __hyphen(self, text: str):
+    def hyphen(self, text: str):
         text = re.sub(r'(\w+)(-)(\n)(\w*)', r'\1\4', text)     # (\w+) 1 o mas texto, (r'\1\4) primer y cuarto bloque '
         return text

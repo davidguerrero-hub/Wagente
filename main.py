@@ -1,4 +1,5 @@
 from pdf_parser import Parser
+from vector_database import Vectordb_manager
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
@@ -15,14 +16,15 @@ MODELS = [
     {"nombre": "gemini-2.0-flash", "activo": True}
 ]
 
-parser = Parser()
-parser.convert()
+# parser = Parser()
+# parser.convert()
 
+vector = Vectordb_manager()
+array = vector.convert()
+print(len(array))
+for i in range(15):
+    print(array[i] + "\n" + "="*50)
 
-# print("Numero de Chunks: " + str(len(chunks)) + "\n")
-# for i in range(10):
-#     print(chunks[i])
-#     print("-" * 60)
 
 # llm = OpenAI(base_url=URL, api_key=KEY)
 # response = llm.chat.completions.create(model=MODELS[0]["nombre"], messages=[{"role": "user", 
