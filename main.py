@@ -19,7 +19,7 @@ MODELS = [
 # parser = Parser()
 # parser.convert()
 
-vector = Vectordb_manager()
+vector = Vectordb_manager(arg_size = 1000, arg_overlap = 300)
 array = vector.convert()
 print(len(array))
 for i in range(15):
