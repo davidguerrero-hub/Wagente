@@ -21,9 +21,6 @@ MODELS = [
 
 vector = Vectordb_manager(arg_size = 1000, arg_overlap = 300)
 array = vector.convert()
-print(len(array))
-for i in range(15):
-    print(array[i] + "\n" + "="*50)
 
 
 # llm = OpenAI(base_url=URL, api_key=KEY)
