@@ -1,16 +1,17 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
+from embedding_model import Embedding_model
 import chromadb
 import json
 
 class Vectordb_manager():
 
-    def __init__(self, arg_size: int = 1000, arg_overlap: int = 300, arg_model: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    def __init__(self, arg_size: int = 1000, arg_overlap: int = 300, arg_model: str = "sentence-transformers/all-MiniLM-L6-v2", k: int = 5):
+        self.embbeding_model = Embedding_model(arg_model)
+        self.k = k
         self.batch_size = 8
         self.vectordb_path = "./documents/vectordb/"
-        self.model_name = arg_model                                         # Nombre del embedding
-        self.model = self.set_model(self.model_name)                        # Funcion set_model
         self.clientdb = chromadb.PersistentClient(path=self.vectordb_path)
+        self.collection_name = "collection"
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size = arg_size, 
             chunk_overlap = arg_overlap, 
@@ -21,7 +22,7 @@ class Vectordb_manager():
     def convert(self):
         unified = self.get_text()
         chunks = self.split(unified)
-        self.embedding_model(chunks)
+        self.create_vectordb(chunks)
         return True
 
 
@@ -38,24 +39,28 @@ class Vectordb_manager():
         return chunks
     
 
-    def embedding_model(self, chunks):                               # !MEJORA: batching (tiene su propio tqdm), metadata 
+    def create_vectordb(self, chunks): 
         try:                                                                # Si no existe la collection
-            self.clientdb.delete_collection("collection")
+            self.clientdb.delete_collection(self.collection_name)
             print("[!] Collection deleted, creating new one")
         except Exception:
             print("[!] Collection inexistent, creating new one")
-        collection = self.clientdb.get_or_create_collection(name="collection")
+        collection = self.clientdb.get_or_create_collection(name=self.collection_name)
         id_array = []
         print("[_] Adding data to ChromaDB...")
         for i in range(len(chunks)):
             id_array.append("id_" + str(i))
-        embedding_array = (self.model.encode(chunks, 
-                                             batch_size=self.batch_size, 
-                                             show_progress_bar=True).tolist())
+        embedding_array = self.embbeding_model.encode("list", chunks)
         collection.add(ids=id_array, embeddings=embedding_array, documents=chunks)
         return True
 
 
-    def set_model(self, model_name: str):
-        print("[_] Loading embedding model...")
-        return SentenceTransformer(model_name)
+    def retrive(self, query: str):
+        embedding = self.collection_name.encode("str", query)
+        try:
+            collection = self.clientdb.get_collection(self.collection_name)
+        except Exception:
+            print("[#] Error <Vector_database>: collection inexistent")
+            return ""
+        results = collection.query(query_embeddings=[embedding], n_results=self.k)
+        return results
